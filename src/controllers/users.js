@@ -1,5 +1,7 @@
 import users from "../model/users.js";
 
+import bcrypt from "bcryptjs";
+
 export const RegisterController = async (req, res) => {
 
   const { username, email, password } = req.body;
@@ -35,6 +37,9 @@ export const LoginController = async (req, res) => {
     const data = new users(req.body);
 
     let emailID = await users.findOne({ email });
+
+
+    const decryptpass =await bcrypt.compare( data.password,emailID.password )
     
     try {
       if (emailID.email !== data.email) {
@@ -43,7 +48,7 @@ export const LoginController = async (req, res) => {
           message: "Email Not Found Please Register",
         });
       } else {
-        if (emailID.password === data.password) {
+        if (decryptpass === true) {
           res.status(200).json({
               status:200,
             message: "User Login Success",
